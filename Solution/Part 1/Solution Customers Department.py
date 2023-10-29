@@ -102,7 +102,7 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-processed_data_path = f"{user_id}_ratings_table"
+processed_data_path = f"{user_id}_processed_ratings_table"
 
 # Write the processed DataFrame into a table
 ratings_df.write.mode("overwrite").saveAsTable(processed_data_path)
