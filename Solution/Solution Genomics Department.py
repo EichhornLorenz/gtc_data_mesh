@@ -21,7 +21,7 @@ genome_tags_df = spark.read.table("genome_tags")
 
 # MAGIC %md
 # MAGIC ### Step 2: Enrich Genome Scores with Tag Names
-# MAGIC We enrich the 'genome_scores' dataset by joining it with the 'genome_tags' dataset based on the 'tag' column, which will be renamed as 'tag_names'.
+# MAGIC We enrich the 'genome_scores' dataset by joining it with the 'genome_tags' dataset based on the 'tagId' column and rename the 'tag' column to 'tag_names'.
 
 # COMMAND ----------
 
