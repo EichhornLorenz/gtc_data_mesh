@@ -26,13 +26,15 @@ import pyspark.sql.types as T
 # MAGIC %md
 # MAGIC ### Step 2: Extracting Movie Year from the Title and modifying the Title
 # MAGIC
-# MAGIC In this step, we extract the movie year from the 'title' column using a regular expression and create a new column called 'year'. We then strip the movie year from the 'title' column
+# MAGIC In this step, we extract the movie year from the `title` column using a regular expression and create a new column called `year`. We then strip the movie year from the `title` column
 # MAGIC
 # MAGIC ** Hint: First remove string in brackets
 
 # COMMAND ----------
 
 # Extract movie year from title (assuming year is in parentheses at the end)
+# | title               | --> | title        | year |
+# | "Home Alone (1990)" |     | "Home Alone" | 1990 |
 
 # Strip movie year from title
 
@@ -41,7 +43,7 @@ import pyspark.sql.types as T
 
 # MAGIC %md
 # MAGIC ### Step 3: Health Checks
-# MAGIC In this step, we conduct preliminary health checks on the dataset to ensure its quality and integrity. The checks include verifying data types, schema integrity, and the existence of the primary key field ('movieId'). These checks are essential for identifying any discrepancies in the data early in the processing pipeline.
+# MAGIC In this step, we conduct preliminary health checks on the dataset to ensure its quality and integrity. The checks include verifying data types, schema integrity, and the existence of the primary key field (`movieId`). These checks are essential for identifying any discrepancies in the data early in the processing pipeline.
 # MAGIC
 
 # COMMAND ----------
