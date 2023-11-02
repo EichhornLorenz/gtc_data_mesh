@@ -1,5 +1,6 @@
 # Databricks notebook source
 from pyspark.sql import functions as F
+import pyspark.sql.types as T
 
 # COMMAND ----------
 
@@ -72,19 +73,25 @@ null_check_result
 
 # COMMAND ----------
 
+# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+
+# COMMAND ----------
+
 # Define the expected output schema and primary key
-output_schema = {
-    "userId": "integer",
-    "movieId": "integer",
-    "timestamp": "timestamp",
-    "rating": "integer",
-    "month": "integer"
-}
+expected_schema = T.StructType([
+    T.StructField("userId", T.LongType(), True),
+    T.StructField("movieId", T.LongType(), True),
+    T.StructField("timestamp", T.TimestampType(), True),
+    T.StructField("rating", T.DoubleType(), True),
+    T.StructField("month", T.IntegerType(), True)
+])
 
-primary_key = ["user_id", "product_id", "timestamp"]
+primary_key = ["userId", "movieId", "timestamp"]
 
-# Display the output schema and primary key
-output_schema, primary_key
+compare_schema(ratings_df, expected_schema)
+
+# Primary Key (movieId) Uniqueness Check
+primary_key_check(ratings_df, primary_key)
 
 # COMMAND ----------
 

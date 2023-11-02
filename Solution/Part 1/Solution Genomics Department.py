@@ -1,5 +1,6 @@
 # Databricks notebook source
 from pyspark.sql import functions as F
+import pyspark.sql.types as T
 
 # COMMAND ----------
 
@@ -62,6 +63,10 @@ enriched_genome_scores_df.groupBy("relevance_bucket").count().display()
 
 # COMMAND ----------
 
+# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+
+# COMMAND ----------
+
 # Data Quality Checks
 important_fields_check = {
     "movieId": enriched_genome_scores_df.filter(F.col("movieId").isNull()).count(),
@@ -73,27 +78,18 @@ important_fields_check = {
 print(important_fields_check)
 
 # Expected Output Schema
-expected_schema = {
-    "movieId": "integer",
-    "tagId": "integer",
-    "tag_names": "string",
-    "relevance": "double",
-    "relevance_bucket": "string"
-}
+expected_schema = T.StructType([
+    T.StructField("movieId", T.LongType(), True),
+    T.StructField("tagId", T.LongType(), True),
+    T.StructField("tag_names", T.StringType(), True),
+    T.StructField("relevance", T.DoubleType(), True),
+    T.StructField("relevance_bucket", T.StringType(), True)
+])
 
-if enriched_genome_scores_df.schema == expected_schema:
-    print("Schema Integrity: Passed")
-else:
-    print("Schema Integrity: Failed")
+compare_schema(enriched_genome_scores_df, expected_schema)
 
-# Primary Key (PK) Uniqueness Check
-non_unique_pks = enriched_genome_scores_df.groupBy("movieId", "tagId").agg(F.count("tagId").alias("count")).filter(F.col("count") > 1).count()
-
-if non_unique_pks == 0:
-    print("Primary Key (movieId, tagId) Uniqueness: Passed")
-else:
-    print(f"Primary Key (movieId, tagId) Uniqueness: Failed for {non_unique_pks} records")
-
+# Primary Key (movieId) Uniqueness Check
+primary_key_check(enriched_genome_scores_df, ["movieId", "tagId"])
 
 # COMMAND ----------
 

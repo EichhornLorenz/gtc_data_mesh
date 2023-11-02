@@ -1,4 +1,9 @@
 # Databricks notebook source
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+# COMMAND ----------
+
 def compare_schema(df, predefined_schema):
     """
     Compare DataFrame schema with a predefined schema and return mismatches or success message.
@@ -25,20 +30,42 @@ def compare_schema(df, predefined_schema):
     
     # Return result message
     if mismatched_fields:
-        return "\n".join(mismatched_fields)
+        print("\n".join(mismatched_fields))
     else:
-        return "Schema matches the predefined schema."
+        print("Schema matches the predefined schema.")
 
 
 
 # COMMAND ----------
 
-# MAGIC %run pwd
+def primary_key_check(df, pk_columns):
+    """
+    Check for duplicate values in the specified primary key columns of the DataFrame.
 
-# COMMAND ----------
+    Args:
+        df (DataFrame): PySpark DataFrame to perform the primary key check on.
+        pk_columns (list): List of primary key column names.
 
-# MAGIC %sh ls
+    Returns:
+        dict: A dictionary containing the check result and number of rows that failed.
+              Example: {"result": "Pass", "failed_rows": 0} or {"result": "Fail", "failed_rows": 10}
+    """
+    # Define a window specification over the primary key columns
+    window_spec = Window.partitionBy(*pk_columns).orderBy(*[F.col(col) for col in pk_columns])
 
-# COMMAND ----------
+    # Calculate the count of rows with the same primary key columns
+    pk_check_df = df.withColumn("count", F.count(pk_columns[0]).over(window_spec))
 
+    # Filter rows where count is greater than 1 (indicating duplicates)
+    duplicates_df = pk_check_df.filter(pk_check_df["count"] > 1)
 
+    # Count the number of duplicates
+    num_duplicates = duplicates_df.count()
+
+    # Prepare the result dictionary
+    result = {
+        "result": "Pass" if num_duplicates == 0 else "Fail",
+        "failed_rows": num_duplicates
+    }
+
+    print(result)

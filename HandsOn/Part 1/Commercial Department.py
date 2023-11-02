@@ -48,26 +48,21 @@ import pyspark.sql.types as T
 
 # COMMAND ----------
 
+# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+
+# COMMAND ----------
+
 expected_schema = T.StructType([
-    T.StructField("movieId", T.IntegerType(), True),
+    T.StructField("movieId", T.LongType(), True),
     T.StructField("title", T.StringType(), True),
     T.StructField("genres", T.StringType(), True),
     T.StructField("year", T.IntegerType(), True)
 ])
 
-if movies_df.schema == expected_schema:
-    print("Schema Integrity: Passed")
-else:
-    print("Schema Integrity: Failed")
+compare_schema(movies_df, expected_schema)
 
 # Primary Key (movieId) Uniqueness Check
-pk_check = movies_df.groupBy("movieId").agg(F.count("movieId").alias("count"))
-non_unique_pks = pk_check.filter(F.col("count") > 1).count()
-
-if non_unique_pks == 0:
-    print("Primary Key (movieId) Uniqueness: Passed")
-else:
-    print(f"Primary Key (movieId) Uniqueness: Failed for {non_unique_pks} records")
+primary_key_check(movies_df, ["movieId"])
 
 
 # COMMAND ----------
