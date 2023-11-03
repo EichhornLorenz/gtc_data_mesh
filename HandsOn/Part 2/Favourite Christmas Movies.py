@@ -9,6 +9,22 @@
 
 # COMMAND ----------
 
+# In case one of the exercises in part one could not be completed run the relevant cell below to prepare the output for part 2
+
+# COMMAND ----------
+
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Commercial Department"
+
+# COMMAND ----------
+
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Customers Department"
+
+# COMMAND ----------
+
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Genomics Department"
+
+# COMMAND ----------
+
 from pyspark.sql import functions as F
 import re
 
@@ -34,7 +50,7 @@ genomes_df = spark.read.table(genomes_data_path)
 # COMMAND ----------
 
 # Filter ratings within December
-december_ratings_df = ratings_df.filter(F.col("month") == 12)
+# december_ratings_df =
 
 # COMMAND ----------
 
@@ -45,7 +61,7 @@ december_ratings_df = ratings_df.filter(F.col("month") == 12)
 # COMMAND ----------
 
 # Join with genomes dataset and filter for Christmas genome with high relevance
-december_ratings_df = december_ratings_df.join(movies_df, "movieId")
+# december_ratings_df =
 
 # COMMAND ----------
 
@@ -56,12 +72,9 @@ december_ratings_df = december_ratings_df.join(movies_df, "movieId")
 # COMMAND ----------
 
 # Calculate average rating and rating frequency per movie
-movie_ratings_summary_df = december_ratings_df.groupBy("movieId", "title", "year").agg(
-    F.avg("rating").alias("average_rating"), 
-    F.count("rating").alias("rating_count")
-).filter(F.col("rating_count") >= 100).orderBy(F.desc("average_rating"))
+# movie_ratings_summary_df =
 
-movie_ratings_summary_df.display()
+# movie_ratings_summary_df.display()
 
 # COMMAND ----------
 
@@ -73,17 +86,13 @@ movie_ratings_summary_df.display()
 # COMMAND ----------
 
 # Filter genome dataset for tags with high relevance
-filtered_genomes_df = genomes_df.filter(
-    F.col("relevance_bucket").isin("Very High", "Excellent")
-).select("movieId", "tag_names")
+# filtered_genomes_df =
 
 # Join with filtered genomes dataset
-final_movie_suggestion_df = movie_ratings_summary_df.join(
-    filtered_genomes_df, "movieId", "left"
-)
+# final_movie_suggestion_df =
 
 # Display the final suggestion
-final_movie_suggestion_df.display()
+# final_movie_suggestion_df.display()
 
 # COMMAND ----------
 
@@ -96,21 +105,11 @@ final_movie_suggestion_df.display()
 # Import necessary libraries for visualization
 import matplotlib.pyplot as plt
 
-# Visualize average ratings
-plt.figure(figsize=(10, 6))
-plt.bar(final_movie_suggestion_df.toPandas()["tag_names"], final_movie_suggestion_df.toPandas()["average_rating"], color='skyblue')
-plt.xlabel('Movie ID')
-plt.ylabel('Average Rating')
-plt.title('Average Ratings of Christmas Movies')
-plt.show()
+# Visualize average ratings per tag_name
 
-# Visualize rating counts
-plt.figure(figsize=(10, 6))
-plt.bar(final_movie_suggestion_df.toPandas()["tag_names"], final_movie_suggestion_df.toPandas()["rating_count"], color='lightgreen')
-plt.xlabel('Movie ID')
-plt.ylabel('Rating Count')
-plt.title('Rating Counts of Christmas Movies')
-plt.show()
+
+# Visualize rating counts per tag_name
+
 
 # COMMAND ----------
 
