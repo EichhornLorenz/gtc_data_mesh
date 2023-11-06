@@ -67,7 +67,7 @@ genomes_df = spark.read.table(genomes_data_path)
 
 # MAGIC %md
 # MAGIC ### Step 4: Calculate Average Ratings and Frequencies
-# MAGIC We calculate the average rating and rating frequency per movie based on December's ratings. Then filter out movies with less than 100 ratings.
+# MAGIC We determine the average rating and rating frequency for each movie using the ratings from December. Exclude movies with fewer than 100 ratings to ensure a representative sample for the average rating calculation.
 
 # COMMAND ----------
 
@@ -80,12 +80,12 @@ genomes_df = spark.read.table(genomes_data_path)
 
 # MAGIC %md
 # MAGIC ### Step 5: Join with Genomes Dataset and Filter for Christmas Genome with High Relevance
-# MAGIC We join the summary table with the 'genomes' dataset, filter for tags with high relevance.
+# MAGIC We join the summary table with the 'genomes' dataset, retaining only MovieIds in the genomes dataset that are tagged as highly relevant or excellent relevance for Christmas.
 # MAGIC
 
 # COMMAND ----------
 
-# Filter genome dataset for tags with high relevance
+# Join with genomes dataset and filter for MovieIds with high relevance or excellent relevance for the Christmas tag
 # filtered_genomes_df =
 
 # Join with filtered genomes dataset
@@ -105,10 +105,44 @@ genomes_df = spark.read.table(genomes_data_path)
 # Import necessary libraries for visualization
 import matplotlib.pyplot as plt
 
-# Visualize average ratings per tag_name
+# Create a dictionary to map unique movie titles to colors
+title_colors = {title: plt.cm.tab20(i / len(final_movie_suggestion_df.toPandas()["title"].unique())) for i, title in enumerate(final_movie_suggestion_df.toPandas()["title"].unique())}
+
+# Visualize average ratings with zoomed-in y-axis and specified colors based on titles
+plt.figure(figsize=(10, 6))
+
+# Iterate through DataFrame rows and plot bars with corresponding colors
+for index, row in final_movie_suggestion_df.toPandas().iterrows():
+    title = row['title']
+    color = title_colors[title]
+    plt.bar(title, row['average_rating'], color=color)
+
+plt.xlabel('Movie Title')
+plt.xticks(rotation=45, ha="right")
+plt.ylabel('Average Rating')
+plt.title('Average Ratings of Christmas Movies')
+
+# Set y-axis limits to zoom in (minimum value to 1.5)
+plt.ylim(1.5, max(final_movie_suggestion_df.toPandas()["average_rating"]) + 0.5)
+
+plt.show()
 
 
-# Visualize rating counts per tag_name
+# Visualize rating counts using points with smaller legend and different colors for different titles
+plt.figure(figsize=(10, 6))
+for title, color in title_colors.items():
+    subset_df = final_movie_suggestion_df.toPandas()[final_movie_suggestion_df.toPandas()["title"] == title]
+    plt.scatter(subset_df["average_rating"], subset_df["rating_count"], color=color, label=title, alpha=0.7, s=50)
+
+plt.xlabel('Average Rating')
+plt.ylabel('Rating Count')
+plt.title('Rating Counts of Christmas Movies')
+
+# Move legend to the right side next to the graph
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size': 8})
+
+plt.show()
+
 
 
 # COMMAND ----------

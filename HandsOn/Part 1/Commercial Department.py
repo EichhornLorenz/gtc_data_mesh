@@ -19,7 +19,9 @@ import pyspark.sql.types as T
 # COMMAND ----------
 
 # Read the Movies dataset from a table
-# movies_df = 
+# movies_df = spark.read.table("movies")
+
+# Display and explore the dataframe
 
 # COMMAND ----------
 
@@ -28,15 +30,18 @@ import pyspark.sql.types as T
 # MAGIC
 # MAGIC In this step, we extract the movie year from the `title` column using a regular expression and create a new column called `year`. We then strip the movie year from the `title` column
 # MAGIC
+# MAGIC Extract movie year from title (assuming year is in parentheses at the end)
+# MAGIC | title               | --> | title        | year |
+# MAGIC |-------------|---------------|-------------|---------------|
+# MAGIC | Home Alone (1990) |     | Home Alone | 1990 |
+# MAGIC | Twelve Monkeys (a.k.a. 12 Monkeys) (1995) |     | Twelve Monkeys | 1995 |
+# MAGIC
+# MAGIC
 # MAGIC ** Hint: First remove string in brackets
 
 # COMMAND ----------
 
-# Extract movie year from title (assuming year is in parentheses at the end)
-# | title               | --> | title        | year |
-# | "Home Alone (1990)" |     | "Home Alone" | 1990 |
-
-# Strip movie year from title
+# Strip movie year from title and cast year to integer
 
 
 # COMMAND ----------
@@ -48,7 +53,8 @@ import pyspark.sql.types as T
 
 # COMMAND ----------
 
-# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+# Run this cell to import dq funtions from utils
+%run Repos/Shared/gtc_data_mesh/Utils/dq_checks
 
 # COMMAND ----------
 

@@ -14,19 +14,19 @@ import pyspark.sql.types as T
 # MAGIC %md
 # MAGIC ### Step 1: Load Data
 # MAGIC
-# MAGIC We start by loading the ratings table data into a PySpark DataFrame from the specified CSV file path.
+# MAGIC We start by loading the ratings table data into a PySpark DataFrame from the table location.
 
 # COMMAND ----------
 
 # Load the ratings table as a PySpark DataFrame
-# ratings_df = 
+ratings_df = spark.read.table("ratings")
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### Step 2: Timestamp Conversion
 # MAGIC
-# MAGIC We convert the 'timestamp' column to the timestamp data type using the `to_timestamp` function.
+# MAGIC We convert the 'timestamp' column to the timestamp data type.
 
 # COMMAND ----------
 
@@ -39,6 +39,16 @@ import pyspark.sql.types as T
 # MAGIC ### Step 3: Create 'Month' Column
 # MAGIC
 # MAGIC We create a new column 'month', extracting the month from the 'timestamp' column using the `month` function.
+# MAGIC
+# MAGIC Output schema:
+# MAGIC |   Column    |   Data Type    |
+# MAGIC |-------------|-----------------|
+# MAGIC | userId      | LongType       |
+# MAGIC | movieId     | LongType       |
+# MAGIC | timestamp   | TimestampType  |
+# MAGIC | rating      | DoubleType     |
+# MAGIC | month       | IntegerType    |
+# MAGIC
 
 # COMMAND ----------
 
@@ -73,7 +83,8 @@ null_check_result
 
 # COMMAND ----------
 
-# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+# Run this cell to import dq funtions from utils
+%run Repos/Shared/gtc_data_mesh/Utils/dq_checks
 
 # COMMAND ----------
 

@@ -15,14 +15,23 @@ import pyspark.sql.types as T
 
 # COMMAND ----------
 
-# genome_scores_df = 
-# genome_tags_df = 
+# genome_scores_df = spark.read.table("genome_scores")
+# genome_tags_df = spark.read.table("genome_tags")
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### Step 2: Enrich Genome Scores with Tag Names
 # MAGIC We enrich the 'genome_scores' dataset by joining it with the 'genome_tags' dataset based on the 'tagId' column and rename the 'tag' column to 'tag_names'.
+# MAGIC
+# MAGIC Output schema:
+# MAGIC |   Column    |   Data Type   |
+# MAGIC |-------------|---------------|
+# MAGIC | movieId     | LongType      |
+# MAGIC | tagId       | LongType      |
+# MAGIC | tag_names   | StringType    |
+# MAGIC | relevance   | DoubleType    |
+# MAGIC
 
 # COMMAND ----------
 
@@ -33,16 +42,37 @@ import pyspark.sql.types as T
 
 # MAGIC %md
 # MAGIC ### Step 3: Create Relevance Buckets
-# MAGIC We create buckets for the 'relevance' column, categorizing values into intervals [0.0-0.1, 0.1-0.2, 0.3-0.4, ...].
+# MAGIC We create buckets for the 'relevance' column, categorizing values into intervals [0.0-0.2, 0.2-0.4, 0.4-0.6, 0.6-0.8, 0.8-1.0].
+# MAGIC
+# MAGIC Documentation Bucketizer: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Bucketizer.html
+# MAGIC
+# MAGIC Output schema:
+# MAGIC |   Column    |   Data Type   |
+# MAGIC |-------------|---------------|
+# MAGIC | movieId     | LongType      |
+# MAGIC | tagId       | LongType      |
+# MAGIC | tag_names   | StringType    |
+# MAGIC | relevance   | DoubleType    |
+# MAGIC | relevance_bucket   | StringType    |
+# MAGIC
 
 # COMMAND ----------
 
 from pyspark.ml.feature import Bucketizer
 
 # Create relevance buckets and name them
+bucket_splits = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 
 # Define bucket names
 bucket_names = ["Low", "Moderate", "High", "Very High", "Excellent"]
+
+# Create Bucketizer
+# bucketizer = Bucketizer()
+
+# Map to bucket name and create relevance_bucket column
+
+# Transform dataframe using the bucketizer
+# enriched_genome_scores_df =
 
 
 # COMMAND ----------
@@ -53,7 +83,8 @@ bucket_names = ["Low", "Moderate", "High", "Very High", "Excellent"]
 
 # COMMAND ----------
 
-# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+# Run this cell to import dq funtions from utils
+%run Repos/Shared/gtc_data_mesh/Utils/dq_checks
 
 # COMMAND ----------
 
