@@ -27,6 +27,10 @@ def compare_schema(df, predefined_schema):
             df_field = next(f for f in df_schema.fields if f.name == field.name)
             if df_field.dataType != field.dataType:
                 mismatched_fields.append(f"Field {field.name} - Expected: {field.dataType}, Actual: {df_field.dataType}")
+
+    for field in df_schema.fields:
+        if field.name not in [f.name for f in predefined_schema.fields]:
+            mismatched_fields.append(f"Additional field which is not in schema: {field.name} - {field.dataType}")
     
     # Return result message
     if mismatched_fields:

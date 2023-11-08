@@ -1,4 +1,20 @@
 # Databricks notebook source
+# In case one of the exercises in part one could not be completed run the relevant cell below to prepare the output for part 2
+
+# COMMAND ----------
+
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Commercial Department"
+
+# COMMAND ----------
+
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Ratings Department"
+
+# COMMAND ----------
+
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Analytics Department"
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Christmas Movie Viewer Prediction
 # MAGIC
@@ -16,9 +32,9 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-genomes_data_path = f"{user_id}_processed_genome_scores"
-movies_data_path = f"{user_id}_movies_table"
-ratings_data_path = f"{user_id}_processed_ratings_table"
+genomes_data_path = f"{user_id}_processed_genomes"
+movies_data_path = f"{user_id}_processed_movies"
+ratings_data_path = f"{user_id}_processed_ratings"
 
 # Load datasets as PySpark DataFrames
 movies_df = spark.read.table(movies_data_path)
@@ -29,12 +45,12 @@ genomes_df = spark.read.table(genomes_data_path)
 
 # MAGIC %md
 # MAGIC ### Step 2: Filter Ratings for December
-# MAGIC We filter the ratings dataset to only include ratings within the month of December.
+# MAGIC We filter the ratings dataset to only include ratings within the month of December which occured in the year 2010 or later.
 
 # COMMAND ----------
 
-# Filter ratings within December
-december_ratings_df = ratings_df.filter(F.col("month") == 12)
+# Filter for ratings in December from 2010 onwards 
+december_ratings_df = ratings_df.filter(F.col("month") == 12).filter(F.col("year") >= 2010).drop("year", "month")
 
 # COMMAND ----------
 

@@ -7,7 +7,7 @@ import pyspark.sql.types as T
 # MAGIC %md
 # MAGIC
 # MAGIC # Movie Dataset Processing
-# MAGIC In this notebook, our focus is on processing the Movies dataset using PySpark. The dataset is loaded into a PySpark DataFrame, and several essential tasks are performed to enhance the dataset's quality and usability. We start by performing Data Quality checks on key fields, ensuring the dataset's integrity. Following that, an additional column is created by extracting the movie year from the titles, enriching the dataset with valuable temporal information. Lastly, the titles are modified to align with the required output schema and Primary Key. These steps are crucial for ensuring data accuracy, enabling precise analysis, and facilitating meaningful insights from the Movies dataset.
+# MAGIC In this notebook, our focus is on processing the Movies dataset using PySpark. The dataset is loaded into a PySpark DataFrame, and several essential tasks are performed to enhance the dataset's quality and usability. We start by creating an additional column by extracting the movie year from the titles, enriching the dataset with valuable temporal information. After that, the titles are modified to align with the required output schema and Primary Key. In a last step data quality checks are run to ensure data accuracy, enabling precise analysis, and facilitating meaningful insights from the Movies dataset.
 
 # COMMAND ----------
 
@@ -43,6 +43,8 @@ import pyspark.sql.types as T
 
 # Strip movie year from title and cast year to integer
 
+# Display the dataframe and ensure year column is correctly created
+# movies_df.display()
 
 # COMMAND ----------
 
@@ -54,7 +56,10 @@ import pyspark.sql.types as T
 # COMMAND ----------
 
 # Run this cell to import dq funtions from utils
-%run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+
+# COMMAND ----------
+
+# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
 
 # COMMAND ----------
 
@@ -87,7 +92,7 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-processed_data_path = f"{user_id}_movies_table"
+processed_data_path = f"{user_id}_processed_movies"
 
 # Write the processed DataFrame into a table
 movies_df.write.mode("overwrite").saveAsTable(processed_data_path)

@@ -26,7 +26,14 @@ movies_df = spark.read.table("movies")
 # MAGIC %md
 # MAGIC ### Step 2: Extracting Movie Year from the Title and modifying the Title
 # MAGIC
-# MAGIC In this step, we extract the movie year from the 'title' column using a regular expression and create a new column called 'year'. We then strip the movie year from the 'title' column
+# MAGIC In this step, we extract the movie year from the `title` column using a regular expression and create a new column called `year`. We then strip the movie year from the `title` column
+# MAGIC
+# MAGIC Extract movie year from title (assuming year is in parentheses at the end)
+# MAGIC | title               | --> | title        | year |
+# MAGIC |-------------|---------------|-------------|---------------|
+# MAGIC | Home Alone (1990) |     | Home Alone | 1990 |
+# MAGIC | Twelve Monkeys (a.k.a. 12 Monkeys) (1995) |     | Twelve Monkeys | 1995 |
+# MAGIC
 # MAGIC
 # MAGIC ** Hint: First remove string in brackets
 
@@ -50,6 +57,10 @@ movies_df.show(5, truncate=False)
 # MAGIC ### Step 3: Health Checks
 # MAGIC In this step, we conduct preliminary health checks on the dataset to ensure its quality and integrity. The checks include verifying data types, schema integrity, and the existence of the primary key field ('movieId'). These checks are essential for identifying any discrepancies in the data early in the processing pipeline.
 # MAGIC
+
+# COMMAND ----------
+
+# Run this cell to import dq funtions from utils
 
 # COMMAND ----------
 
@@ -86,7 +97,7 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-processed_data_path = f"{user_id}_movies_table"
+processed_data_path = f"{user_id}_processed_movies"
 
 # Write the processed DataFrame into a table
 movies_df.write.mode("overwrite").saveAsTable(processed_data_path)

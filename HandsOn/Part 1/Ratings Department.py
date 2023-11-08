@@ -14,12 +14,12 @@ import pyspark.sql.types as T
 # MAGIC %md
 # MAGIC ### Step 1: Load Data
 # MAGIC
-# MAGIC We start by loading the ratings table data into a PySpark DataFrame from the specified CSV file path.
+# MAGIC We start by loading the ratings table data into a PySpark DataFrame from the table location.
 
 # COMMAND ----------
 
 # Load the ratings table as a PySpark DataFrame
-ratings_df = spark.read.table("ratings")
+# ratings_df = spark.read.table("ratings")
 
 # COMMAND ----------
 
@@ -31,19 +31,30 @@ ratings_df = spark.read.table("ratings")
 # COMMAND ----------
 
 # Ensure the 'timestamp' column is of type timestamp
-ratings_df = ratings_df.withColumn("timestamp", F.to_timestamp(F.col("timestamp")))
+
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 3: Create 'Month' Column
+# MAGIC ### Step 3: Create 'Month' and 'Year' Columns
 # MAGIC
-# MAGIC We create a new column 'month', extracting the month from the 'timestamp' column using the `month` function.
+# MAGIC We create two new columns 'month' and 'year', extracting the month and year from the 'timestamp' column using the `month`/`year`  function.
+# MAGIC
+# MAGIC Output schema:
+# MAGIC |   Column    |   Data Type    |
+# MAGIC |-------------|-----------------|
+# MAGIC | userId      | LongType       |
+# MAGIC | movieId     | LongType       |
+# MAGIC | timestamp   | TimestampType  |
+# MAGIC | rating      | DoubleType     |
+# MAGIC | month       | IntegerType    |
+# MAGIC | year       | IntegerType    |
+# MAGIC
 
 # COMMAND ----------
 
 # Create a new column 'month' indicating the month of the rating
-ratings_df = ratings_df.withColumn("month", F.month(F.col("timestamp")))
+
 
 # COMMAND ----------
 
@@ -73,6 +84,10 @@ null_check_result
 
 # COMMAND ----------
 
+# Run this cell to import dq funtions from utils
+
+# COMMAND ----------
+
 # MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
 
 # COMMAND ----------
@@ -83,7 +98,8 @@ expected_schema = T.StructType([
     T.StructField("movieId", T.LongType(), True),
     T.StructField("timestamp", T.TimestampType(), True),
     T.StructField("rating", T.DoubleType(), True),
-    T.StructField("month", T.IntegerType(), True)
+    T.StructField("month", T.IntegerType(), True),
+    T.StructField("year", T.IntegerType(), True)
 ])
 
 primary_key = ["userId", "movieId", "timestamp"]
@@ -109,7 +125,7 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-processed_data_path = f"{user_id}_processed_ratings_table"
+processed_data_path = f"{user_id}_processed_ratings"
 
 # Write the processed DataFrame into a table
 ratings_df.write.mode("overwrite").saveAsTable(processed_data_path)

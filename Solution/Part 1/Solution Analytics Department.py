@@ -15,8 +15,8 @@ import pyspark.sql.types as T
 
 # COMMAND ----------
 
-# genome_scores_df = spark.read.table("genome_scores")
-# genome_tags_df = spark.read.table("genome_tags")
+genome_scores_df = spark.read.table("genome_scores")
+genome_tags_df = spark.read.table("genome_tags")
 
 # COMMAND ----------
 
@@ -36,7 +36,9 @@ import pyspark.sql.types as T
 # COMMAND ----------
 
 # Enrich genome_scores with tag names
+enriched_genome_scores_df = genome_scores_df.join(genome_tags_df, on=["tagId"], how="inner").withColumnRenamed("tag", "tag_names")
 
+enriched_genome_scores_df.show()
 
 # COMMAND ----------
 
@@ -60,19 +62,14 @@ import pyspark.sql.types as T
 
 from pyspark.ml.feature import Bucketizer
 
+enriched_genome_scores_df = enriched_genome_scores_df.drop("relevance_bucket")
 # Create relevance buckets and name them
-bucket_splits = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+bucketizer = Bucketizer(splits=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0], inputCol="relevance", outputCol="relevance_bucket")
+enriched_genome_scores_df = bucketizer.transform(enriched_genome_scores_df)
 
 # Define bucket names
 bucket_names = ["Low", "Moderate", "High", "Very High", "Excellent"]
-
-# Create Bucketizer
-# bucketizer = Bucketizer()
-
-# Map to bucket name and create relevance_bucket column
-
-# Transform dataframe using the bucketizer
-# enriched_genome_scores_df =
+enriched_genome_scores_df = enriched_genome_scores_df.withColumn("relevance_bucket", F.when(F.col("relevance_bucket") == 0, "Low").when(F.col("relevance_bucket") == 1, "Moderate").when(F.col("relevance_bucket") == 2, "High").when(F.col("relevance_bucket") == 3, "Very High").when(F.col("relevance_bucket") == 4, "Excellent").otherwise("Unknown"))
 
 
 # COMMAND ----------
@@ -84,7 +81,10 @@ bucket_names = ["Low", "Moderate", "High", "Very High", "Excellent"]
 # COMMAND ----------
 
 # Run this cell to import dq funtions from utils
-%run Repos/Shared/gtc_data_mesh/Utils/dq_checks
+
+# COMMAND ----------
+
+# MAGIC %run Repos/Shared/gtc_data_mesh/Utils/dq_checks
 
 # COMMAND ----------
 
@@ -126,7 +126,7 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-processed_data_path = f"{user_id}_processed_genome_scores"
+processed_data_path = f"{user_id}_processed_genomes"
 
 # Write the processed DataFrame into a table
 enriched_genome_scores_df.write.mode("overwrite").saveAsTable(processed_data_path)

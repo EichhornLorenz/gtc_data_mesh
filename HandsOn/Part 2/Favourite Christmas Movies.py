@@ -17,11 +17,11 @@
 
 # COMMAND ----------
 
-# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Customers Department"
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Ratings Department"
 
 # COMMAND ----------
 
-# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Genomics Department"
+# MAGIC %run "Repos/Shared/gtc_data_mesh/Solution/Part 1/Solution Analytics Department"
 
 # COMMAND ----------
 
@@ -32,9 +32,9 @@ import re
 user_id = spark.sql("select current_user() as user").collect()[0]['user']
 user_id = re.sub(r'@.+$', "", user_id).replace(".", "_")
 # Define the output path for the processed data
-genomes_data_path = f"{user_id}_processed_genome_scores"
-movies_data_path = f"{user_id}_movies_table"
-ratings_data_path = f"{user_id}_processed_ratings_table"
+genomes_data_path = f"{user_id}_processed_genomes"
+movies_data_path = f"{user_id}_processed_movies"
+ratings_data_path = f"{user_id}_processed_ratings"
 
 # Load datasets as PySpark DataFrames
 movies_df = spark.read.table(movies_data_path)
@@ -45,11 +45,11 @@ genomes_df = spark.read.table(genomes_data_path)
 
 # MAGIC %md
 # MAGIC ### Step 2: Filter Ratings for December
-# MAGIC We filter the ratings dataset to only include ratings within the month of December.
+# MAGIC We filter the ratings dataset to only include ratings within the month of December which occured in the year 2010 or later.
 
 # COMMAND ----------
 
-# Filter ratings within December
+# Filter for ratings in December from 2010 onwards
 # december_ratings_df =
 
 # COMMAND ----------
